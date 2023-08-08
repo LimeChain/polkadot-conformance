@@ -15,6 +15,7 @@ jobs:
       new_release: ${{ steps.check.outputs.new_release }}
       cumulus-binary-release-tag: ${{ steps.cumulus-binary-release-tag.outputs.tag }}
       cumulus-wasm-release-tag: ${{ steps.cumulus-wasm-release-tag.outputs.tag }}
+      wasm-injector-release-tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,7 +23,16 @@ jobs:
         with: 
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ref: feat/cicd
+
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: LimeChain/wasm-injector  # The repository to scan.
+          releases-only: true  # We know that all relevant tags have a GitHub release for them.
+          prefix: 'v'
+        id: wasm-injector-release-tag  # The step ID to refer to later.
     
+      - run: echo "Wasm injector is at version ${{ steps.wasm-injector-release-tag.outputs.tag }}"
+
       - uses: oprypin/find-latest-tag@v1
         with:
           repository: paritytech/cumulus  # The repository to scan.
@@ -71,6 +81,7 @@ jobs:
           echo "Cumulus WASM tag: ${{ steps.cumulus-wasm-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Kagome tag: ${{ steps.kagome-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Polkadot tag: ${{ steps.polkadot-release-tag.outputs.tag }}" >> dependencies.txt
+          echo "Wasm injector tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}" >> dependencies.txt
 
       - name: Check if dependencies have changed
         id: check
@@ -101,6 +112,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with: 
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Fetch Github Release Asset from wasm-injector
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "LimeChain/wasm-injector"
+          file: "wasm-injector-ubuntu-22"
+          target: "wasm-injector-ubuntu-22"
+          version: "tags/${{ needs.check.outputs.wasm-injector-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Fetch Github Release Asset from polkadot
@@ -139,6 +159,7 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - run: find . -type f -regex '.*/rococo-parachain_runtime.*wasm' -exec mv {} fetched.wasm \;
+      - run: mv wasm-injector-ubuntu-22 wasm-injector
 
       - name: Fetch kagome
         run: |
@@ -187,12 +208,12 @@ jobs:
       
       - run: mv fetched.wasm ./target/debug/test.wasm
 
-      - name: Run wasm_injector
+      - name: Run wasm-injector
         run: |
-          ./target/debug/wasm_injector convert ./target/debug/test.wasm ./wasm/orig.wasm.hex --hexified
-          ./target/debug/wasm_injector inject stack-overflow ./target/debug/test.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          ./target/debug/wasm_injector inject heap-overflow ./target/debug/test.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          ./target/debug/wasm_injector inject infinite-loop ./target/debug/test.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          ./target/debug/wasm-injector convert ./target/debug/test.wasm ./wasm/orig.wasm.hex --hexified
+          ./target/debug/wasm-injector inject stack-overflow ./target/debug/test.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          ./target/debug/wasm-injector inject heap-overflow ./target/debug/test.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          ./target/debug/wasm-injector inject infinite-loop ./target/debug/test.wasm ./wasm/infinite-loop.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
