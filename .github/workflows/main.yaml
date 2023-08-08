@@ -28,7 +28,6 @@ jobs:
         with:
           repository: LimeChain/wasm-injector  # The repository to scan.
           releases-only: true  # We know that all relevant tags have a GitHub release for them.
-          prefix: 'v'
         id: wasm-injector-release-tag  # The step ID to refer to later.
     
       - run: echo "Wasm injector is at version ${{ steps.wasm-injector-release-tag.outputs.tag }}"
