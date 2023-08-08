@@ -157,8 +157,10 @@ jobs:
           regex: true
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - run: find . -type f -regex '.*/rococo-parachain_runtime.*wasm' -exec mv {} fetched.wasm \;
-      - run: mv wasm-injector-ubuntu-22 wasm-injector
+      - name: Rename files
+        run: |
+          find . -type f -regex '.*/rococo-parachain_runtime.*wasm' -exec mv {} fetched.wasm \;
+          mv wasm-injector-ubuntu-22 wasm-injector
 
       - name: Fetch kagome
         run: |
@@ -176,43 +178,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libstdc++6 libc6 libnsl2
 
-      - name: Debugging
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "List files:"
-          ls -la
-          echo "GLIBC version:"
-          ldd --version
-          echo "GITHUB_WORKSPACE value:"
-          echo "$GITHUB_WORKSPACE"
-
-      - name: Add binaries to PATH
+      - name: Add binaries to PATH and make them executable
         run: |
           echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
           chmod +x polkadot
           chmod +x polkadot-parachain
           chmod +x zombienet
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-      
-      - run: mv fetched.wasm ./target/debug/test.wasm
+          chmod +x wasm-injector
 
       - name: Run wasm-injector
         run: |
-          ./target/debug/wasm-injector convert ./target/debug/test.wasm ./wasm/orig.wasm.hex --hexified
-          ./target/debug/wasm-injector inject stack-overflow ./target/debug/test.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          ./target/debug/wasm-injector inject heap-overflow ./target/debug/test.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          ./target/debug/wasm-injector inject infinite-loop ./target/debug/test.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
+          wasm-injector inject stack-overflow fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
