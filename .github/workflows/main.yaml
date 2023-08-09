@@ -189,9 +189,9 @@ jobs:
       - name: Run wasm-injector
         run: |
           wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate-block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate-block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate-block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
