@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: 
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ref: feat/cicd
@@ -109,7 +109,7 @@ jobs:
     if: needs.check.outputs.new_release == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: 
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
