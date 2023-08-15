@@ -3,3 +3,8 @@ Cumulus binary tag: v0.9.430
 Cumulus WASM tag: parachains-v9430
 Kagome tag: v0.9.0
 Polkadot tag: v1.0.0
+Tests folder hash: 5cd337198ead0768975610a135e26257153198c7
+Cumulus binary tag: v1.0.0
+Kagome tag: v0.9.0
+Polkadot tag: v1.0.0
+Wasm injector tag: 0.1.0
