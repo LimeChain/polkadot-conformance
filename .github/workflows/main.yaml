@@ -144,17 +144,16 @@ jobs:
           docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
          
       - run : |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends software-properties-common curl gpg gpg-agent wget
-          curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-          echo "deb http://deb.debian.org/debian/ experimental main" | sudo tee -a /etc/apt/sources.list.d/docker.list > /dev/null
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131
-          sudo add-apt-repository -y "deb http://deb.debian.org/debian/ testing main"
-          sudo apt-get install chrony=4.4-1 -y
-          sudo apt-get update || true
-          sudo apt-get install --no-install-recommends -y libstdc++6 libc6 libnsl2 || true
+          sudo apt-get update && \
+          sudo apt-get install -y --no-install-recommends software-properties-common curl gpg gpg-agent wget && \
+          curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+          echo "deb http://deb.debian.org/debian/ experimental main" | sudo tee -a /etc/apt/sources.list.d/docker.list > /dev/null && \
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && \
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9 && \
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131 && \
+          sudo add-apt-repository -y "deb http://deb.debian.org/debian/ testing main" && \
+          sudo apt-get update || true && \
+          sudo apt-get install --no-install-recommends -y libstdc++6 libc6 libnsl2 || true && \
 
       - name: Add binaries to PATH and make them executable
         run: |
