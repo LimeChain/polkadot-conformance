@@ -10,11 +10,4 @@ alice: parachain 2000 is registered within 60 seconds
 
 # Ensure parachains made progress.
 alice: parachain 2000 block height != 1 within 60 seconds
-
-# Check code size.
-# We have a different hard limit for the candidate max code size in different host implementations
-# however all of them are > 8mb so we only need to ensure it was put in the +Inf buckets
-alice: reports histogram polkadot_parachain_candidate_validation_code_size has 0 samples in buckets ["16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608"] within 30 seconds
-
-# Check that we have samples > 8mb.
-alice: reports histogram polkadot_parachain_candidate_validation_code_size has at least 1 samples in buckets ["+Inf"] within 30 seconds
+alice: log line matches glob "*Trap: final > memory:*" within 60 seconds
