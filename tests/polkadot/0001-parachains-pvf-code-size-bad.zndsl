@@ -15,5 +15,5 @@ alice: parachain 2000 block height != 1 within 60 seconds
 # We have a different hard limit for the candidate max code size in different host implementations
 # however if the code size is not acceptable we should have 0 in all buckets
 
-# check if we have at least 1 sample, but we should have many more.
-alice: reports histogram polkadot_parachain_candidate_validation_code_size has 0 samples in buckets ["16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", ""+Inf"] within 30 seconds
+# check that we don't have any samples.
+alice: reports histogram polkadot_parachain_candidate_validation_code_size has 0 samples in buckets ["16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", "+Inf"] within 30 seconds
