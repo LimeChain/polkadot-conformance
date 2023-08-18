@@ -143,7 +143,7 @@ jobs:
         run: |
           docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
          
-      - run : |
+      - run : 
           sudo apt-get update && \
           sudo apt-get install -y --no-install-recommends software-properties-common curl gpg gpg-agent wget && \
           curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
