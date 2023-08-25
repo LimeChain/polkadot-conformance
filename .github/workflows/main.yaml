@@ -135,14 +135,14 @@ jobs:
           file: "zombienet-linux-x64"
           target: "zombienet"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Rename inejctor
-        run: mv wasm-injector-ubuntu-22 wasm-injector
-
+      
+      - run: mv wasm-injector-ubuntu-22 wasm-injector
+      - run: docker run --user root -v $GITHUB_WORKSPACE:/hostdir --rm --entrypoint sh moonbeamfoundation/moonbeam:v0.32.1 -c "cp /moonbeam/moonbeam /hostdir/moonbeam && chmod +x /hostdir/moonbeam"
+      
       - name: Fetch kagome
         run: |
           docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
-         
+
       - run : sudo apt-get update
       - run: sudo apt-get install -y --no-install-recommends software-properties-common curl gpg gpg-agent wget
       - run: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -154,13 +154,32 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install --no-install-recommends -y libstdc++6 libc6 libnsl2 || true
 
-      - name: Add binaries to PATH and make them executable
-        run: |
+      - run: |
           echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
+          sudo chmod +x moonbeam
           chmod +x polkadot
-          chmod +x polkadot-parachain
           chmod +x zombienet
           chmod +x wasm-injector
+          chmod +x polkadot-parachain
+
+      - run: moonbeam export-genesis-wasm --chain moonbase-local > fetched.wasm
+      - run: |
+          wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block fetched.wasm ./wasm/code-size.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.9.1'
+
+      - name: Run Kagome Tests with moonbeam runtime
+        run: julia scripts/runTests.jl moonbeam/kagome
+
+      - name: Run Polkadot Tests with moonbeam runtime
+        run: julia scripts/runTests.jl moonbeam/polkadot
 
       - name: Export cumulus genesis wasm
         run: polkadot-parachain export-genesis-wasm > fetched.wasm
@@ -172,14 +191,11 @@ jobs:
           wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
           wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
           wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
-
-      - name: Set up Julia
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.9.1'
     
       - name: Run Kagome Tests
-        run: julia scripts/runTests.jl kagome
+        run: julia scripts/runTests.jl cumulus/kagome
 
       - name: Run Polkadot Tests
-        run: julia scripts/runTests.jl polkadot
+        run: julia scripts/runTests.jl cumulus/polkadot
+
+

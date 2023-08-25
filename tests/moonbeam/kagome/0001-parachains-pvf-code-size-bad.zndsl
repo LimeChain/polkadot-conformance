@@ -1,0 +1,15 @@
+Description: PVF code size
+Network: ./0001-parachains-pvf-code-size-bad.toml
+Creds: config
+
+# Check authority status.
+alice: reports node_roles is 4
+
+# Ensure parachains are registered.
+alice: parachain 2000 is registered within 60 seconds
+
+# Ensure parachains made progress.
+alice: parachain 2000 block height != 1 within 60 seconds
+
+# this is a temporary solution to the problem. Kagome host should implement parachain_candidate_validation_code_size metric
+alice: log line matches glob "*Trap: final > memory:*" within 60 seconds
