@@ -15,6 +15,9 @@ jobs:
       new_release: ${{ steps.check.outputs.new_release }}
       cumulus-binary-release-tag: ${{ steps.cumulus-binary-release-tag.outputs.tag }}
       wasm-injector-release-tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}
+      moonbeam-release-tag: ${{ steps.moonbeam-release-tag.outputs.tag }}
+      acala-release-tag: ${{ steps.acala-release-tag.outputs.tag }}
+      kagome-releae-tag: ${{ step.kagome-release-tag.output.tag }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -56,6 +59,23 @@ jobs:
   
       - run: echo "Polkadot is at version ${{ steps.polkadot-release-tag.outputs.tag }}"
 
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: moonbeam-foundation/moonbeam  # The repository to scan.
+          releases-only: true  # We know that all relevant tags have a GitHub release for them.
+        id: moonbeam-release-tag  # The step ID to refer to later.
+  
+      - run: echo "Moonbeam is at version ${{ steps.moonbeam-release-tag.outputs.tag }}"
+
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: AcalaNetwork/Acala  # The repository to scan.
+          releases-only: true  # We know that all relevant tags have a GitHub release for them.
+        id: acala-release-tag  # The step ID to refer to later.
+  
+      - run: echo "Acala is at version ${{ steps.acala-release-tag.outputs.tag }}"
+
+
       - name: Calculate hash of the tests folder and write to dependencies.txt
         run: |
           echo "Calculating hash for the tests folder..."
@@ -63,13 +83,14 @@ jobs:
           echo "Tests folder hash: $TESTS_HASH"
           echo "Tests folder hash: $TESTS_HASH" > dependencies.txt
 
-
       - name: Write tags to dependencies file
         run: |
           echo "Cumulus binary tag: ${{ steps.cumulus-binary-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Kagome tag: ${{ steps.kagome-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Polkadot tag: ${{ steps.polkadot-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Wasm injector tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}" >> dependencies.txt
+          echo "Moonbeam tag: ${{ steps.moonbeam-release-tag.outputs.tag }}" >> dependencies.txt"
+          echo "Acala tag: ${{ steps.acala-release-tag.outputs.tag }}" >> dependencies.txt"
 
       - name: Check if dependencies have changed
         id: check
@@ -111,6 +132,9 @@ jobs:
           version: "tags/${{ needs.check.outputs.wasm-injector-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
+      - name: Rename wasm-injector
+        run: mv wasm-injector-ubuntu-22 wasm-injector
+
       - name: Fetch Github Release Asset from polkadot
         uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -136,12 +160,17 @@ jobs:
           target: "zombienet"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       
-      - run: mv wasm-injector-ubuntu-22 wasm-injector
-      - run: docker run --user root -v $GITHUB_WORKSPACE:/hostdir --rm --entrypoint sh moonbeamfoundation/moonbeam:v0.32.1 -c "cp /moonbeam/moonbeam /hostdir/moonbeam && chmod +x /hostdir/moonbeam"
-      
-      - name: Fetch kagome
+      - name: Fetch Moonbeam
         run: |
-          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
+          docker run --user root -v $GITHUB_WORKSPACE:/hostdir --rm --entrypoint sh moonbeamfoundation/moonbeam:${{ needs.check.outputs.moonbeam-release-tag }} -c "cp /moonbeam/moonbeam /hostdir/moonbeam && chmod +x /hostdir/moonbeam"
+      
+      - name: Fetch Kagome
+        run: |
+          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:${{ needs.check.outputs.kagome-release-tag }} sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
+
+      - name: Fetch Acala
+        run: |
+          docker run --user root -v $GITHUB_WORKSPACE:/hostdir --rm --entrypoint sh acala/acala-node:${{ needs.check.outputs.acala-release-tag }} -c "cp /usr/local/bin/acala hostdir/acala && chmod +x /hostdir/acala"
 
       - run : sudo apt-get update
       - run: sudo apt-get install -y --no-install-recommends software-properties-common curl gpg gpg-agent wget
@@ -162,13 +191,33 @@ jobs:
           chmod +x wasm-injector
           chmod +x polkadot-parachain
 
-      - run: moonbeam export-genesis-wasm --chain moonbase-local > fetched.wasm
-      - run: |
-          wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject noops --size 50 validate_block fetched.wasm ./wasm/code-size.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
+      - name: Export Acala genesis wasm
+        run: ./acala export-genesis-wasm --chain=acala-dev > acala.wasm
+
+      - name: Inject Acala wasm
+        run: |
+          wasm-injector convert acala.wasm ./wasm/orig.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block acala.wasm ./wasm/code-size.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block acala.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block acala.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block acala.wasm ./wasm/infinite-loop.wasm.hex --hexified
+    
+      - name: Run Kagome Tests
+        run: julia scripts/runTests.jl acala/kagome
+
+      - name: Run Polkadot Tests
+        run: julia scripts/runTests.jl acala/polkadot
+
+      - name: Export Moonbeam wasm
+        run: moonbeam export-genesis-wasm --chain moonbase-local > moonbeam.wasm
+
+      - name: Inject Moonbeam wasm
+        run: |
+          wasm-injector convert moonbeam.wasm ./wasm/orig.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block moonbeam.wasm ./wasm/code-size.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block moonbeam.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block moonbeam.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block moonbeam.wasm ./wasm/infinite-loop.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
@@ -182,15 +231,15 @@ jobs:
         run: julia scripts/runTests.jl moonbeam/polkadot
 
       - name: Export cumulus genesis wasm
-        run: polkadot-parachain export-genesis-wasm > fetched.wasm
+        run: polkadot-parachain export-genesis-wasm > cumulus.wasm
 
-      - name: Run wasm-injector
+      - name: Inject cumulus wasm
         run: |
-          wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject noops --size 50 validate_block fetched.wasm ./wasm/code-size.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector convert cumulus.wasm ./wasm/orig.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block cumulus.wasm ./wasm/code-size.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block cumulus.wasm ./wasm/stack-overflow.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block cumulus.wasm ./wasm/heap-overflow.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block cumulus.wasm ./wasm/infinite-loop.wasm.hex --hexified
     
       - name: Run Kagome Tests
         run: julia scripts/runTests.jl cumulus/kagome
