@@ -192,59 +192,56 @@ jobs:
           chmod +x polkadot-parachain
 
       - name: Export Acala genesis wasm
-        run: ./acala export-genesis-wasm --chain=acala-dev > acala.wasm
+        run: acala export-genesis-wasm --chain=acala-local > ./wasm/acala.wasm.hex
 
       - name: Inject Acala wasm
         run: |
-          wasm-injector convert acala.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject noops --size 50 validate_block acala.wasm ./wasm/code-size.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate_block acala.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate_block acala.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate_block acala.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block ./wasm/acala.wasm.hex ./wasm/code-size-acala.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/acala.wasm.hex ./wasm/stack-overflow-acala.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/acala.wasm.hex ./wasm/heap-overflow-acala.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/acala.wasm.hex ./wasm/infinite-loop-acala.wasm.hex --hexified
     
-      - name: Run Acala Tests
+      - name: Run Kagome tests with Acala runtime
         run: julia scripts/runTests.jl acala/kagome
 
-      - name: Run Polkadot Tests
+      - name: Run Polkadot test with Acala runtime
         run: julia scripts/runTests.jl acala/polkadot
 
       - name: Export Moonbeam wasm
-        run: moonbeam export-genesis-wasm --chain moonbase-local > moonbeam.wasm
+        run: moonbeam export-genesis-wasm --chain=moonbase-local > ./wasm/moonbase.wasm.hex
 
       - name: Inject Moonbeam wasm
         run: |
-          wasm-injector convert moonbeam.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject noops --size 50 validate_block moonbeam.wasm ./wasm/code-size.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate_block moonbeam.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate_block moonbeam.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate_block moonbeam.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block ./wasm/moonbase.wasm.hex ./wasm/code-size-moonbase.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/stack-overflow-moonbase.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/heap-overflow-moonbase.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/moonbase.wasm.hex ./wasm/infinite-loop-moonbase.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
           version: '1.9.1'
 
-      - name: Run Kagome Tests with moonbeam runtime
-        run: julia scripts/runTests.jl moonbeam/kagome
+      - name: Run Kagome Tests with Moonbeam runtime
+        run: julia scripts/runTests.jl moonbeam kagome
 
-      - name: Run Polkadot Tests with moonbeam runtime
-        run: julia scripts/runTests.jl moonbeam/polkadot
+      - name: Run Polkadot Tests with Moonbeam runtime
+        run: julia scripts/runTests.jl moonbeam polkadot
 
       - name: Export cumulus genesis wasm
-        run: polkadot-parachain export-genesis-wasm > cumulus.wasm
+        run: polkadot-parachain export-genesis-wasm --chain=staging > ./wasm/rococo.wasm.hex # This loads the chain_spec::rococo_parachain::staging_rococo_parachain_local_config()
 
       - name: Inject cumulus wasm
         run: |
-          wasm-injector convert cumulus.wasm ./wasm/orig.wasm.hex --hexified
-          wasm-injector inject noops --size 50 validate_block cumulus.wasm ./wasm/code-size.wasm.hex --hexified
-          wasm-injector inject stack-overflow validate_block cumulus.wasm ./wasm/stack-overflow.wasm.hex --hexified
-          wasm-injector inject heap-overflow validate_block cumulus.wasm ./wasm/heap-overflow.wasm.hex --hexified
-          wasm-injector inject infinite-loop validate_block cumulus.wasm ./wasm/infinite-loop.wasm.hex --hexified
+          wasm-injector inject noops --size 50 validate_block ./wasm/rococo.wasm.hex ./wasm/code-size-rococo.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/stack-overflow-rococo.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/heap-overflow-rococo.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/rococo.wasm.hex ./wasm/infinite-loop-rococo.wasm.hex --hexified
     
-      - name: Run Kagome Tests
-        run: julia scripts/runTests.jl cumulus/kagome
+      - name: Run Kagome Tests with Rococo runtime
+        run: julia scripts/runTests.jl cumulus kagome
 
-      - name: Run Polkadot Tests
-        run: julia scripts/runTests.jl cumulus/polkadot
+      - name: Run Polkadot Tests with Rococo runtime
+        run: julia scripts/runTests.jl cumulus polkadot
 
 

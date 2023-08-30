@@ -18,4 +18,4 @@ alice: parachain 2000 block height != 1 within 60 seconds
 alice: reports histogram kagome_pvf_execution_time has at least 0 samples in buckets ["0.01", "0.025", "0.05", "0.1", "0.25", "0.5", "1", "2"] within 60 seconds
 
 # Check if we have no samples > 2s.
-alice: reports histogram kagome_pvf_execution_time has at least 1 samples in buckets ["1", "2", "3", "4", "5", "6", "8", "10", "12", "+Inf"] within 10 seconds
+alice: reports histogram kagome_pvf_execution_time has at least 1 samples in buckets ["3", "4", "5", "6", "8", "10", "12", "+Inf"] within 10 seconds

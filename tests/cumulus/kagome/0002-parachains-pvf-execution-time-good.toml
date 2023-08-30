@@ -4,7 +4,6 @@ timeout = 1000
 [relaychain]
 default_command = "polkadot"
 default_args = [ "-lparachain=debug" ]
-
 chain = "rococo-local"
 
 [relaychain.default_resources]
@@ -14,18 +13,19 @@ requests = { memory = "2G", cpu = "1" }
   [[relaychain.nodes]]
   name = "alice"
   command = "kagome"
-  args = [ "--alice", "-lparachain=debug,runtime=debug" ]
+  args = [ "--alice", "-lruntime=debug,parachain=trace" ]
   prometheus_prefix = "kagome"
 
   [[relaychain.nodes]]
   name = "bob"
-  args = [ "--bob", "-lparachain=debug,runtime=debug"]
+  args = [ "--bob", "-lruntime=debug,parachain=trace" ]
 
 [[parachains]]
 id = 2000
-genesis_wasm_path="./wasm/orig.wasm.hex"
+genesis_wasm_path="./wasm/rococo.wasm.hex"
+chain = "staging"
 
   [parachains.collator]
   name = "collator01"
   command = "polkadot-parachain"
-  args = ["-lparachain=debug"]
+  args = [ "-lruntime=debug,parachain=trace" ]

@@ -21,7 +21,8 @@ requests = { memory = "2G", cpu = "1" }
 
 [[parachains]]
 id = 2000
-chain = "acala-dev"
+chain = "acala-local"
+genesis_wasm_path = "./wasm/acala.wasm.hex"
 
   [parachains.collator]
   name = "collator01"
