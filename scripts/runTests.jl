@@ -57,7 +57,21 @@ if isempty(ARGS)
             end
         end
     end
-else
+elseif length(ARGS) == 1
+    runtime::String = getindex(ARGS, 1)
+
+    if (length(findall( x -> x == runtime, runtimes )) == 0)
+        println("Runtime `$(runtime)` not supported.")
+        exit(1)
+    end
+
+    # For each host ...
+    for host::String in hosts
+        withenv("ZOMBIENET_DEFAULT_START_COMMAND" => host) do
+            run_host_tests(runtime, host)
+        end
+    end
+else length(ARGS) == 2
     # Get the runtime and host from the command line arguments
     runtime::String = getindex(ARGS, 1)
     host::String = getindex(ARGS, 2)
