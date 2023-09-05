@@ -101,6 +101,7 @@ jobs:
       - name: Check if dependencies have changed
         id: check
         run: |
+          git diff-index --quiet HEAD --
           if git diff-index --quiet HEAD --; then
             echo "dependencies file has NOT changed."
             echo "new-release=false" >> "$GITHUB_OUTPUT"
