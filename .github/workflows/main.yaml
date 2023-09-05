@@ -191,9 +191,6 @@ jobs:
           chmod +x wasm-injector
           chmod +x polkadot-parachain
 
-      - name: Create wasm folder
-        run: mkdir wasm
-
       - name: Export Acala genesis wasm
         run: acala export-genesis-wasm --chain=acala-local > ./wasm/acala.wasm.hex
 
