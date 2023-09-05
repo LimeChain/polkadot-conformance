@@ -17,7 +17,7 @@ jobs:
       wasm-injector-release-tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}
       moonbeam-release-tag: ${{ steps.moonbeam-release-tag.outputs.tag }}
       acala-release-tag: ${{ steps.acala-release-tag.outputs.tag }}
-      kagome-release-tag: ${{ steps.kagome-release-tag.output.tag }}
+      kagome-releae-tag: ${{ steps.kagome-release-tag.output.tag }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
