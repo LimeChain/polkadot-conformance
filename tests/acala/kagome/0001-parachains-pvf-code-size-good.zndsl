@@ -8,15 +8,15 @@ alice: reports node_roles is 4
 # Ensure parachains are registered.
 alice: parachain 2000 is registered within 60 seconds
 
-# Check code size.
-# We have a different hard limit for the candidate max code size in different host implementations
-# however if the code size is acceptable we should have it put in some metric bucket
-
-# check if we have at least 1 sample, but we should have many more.
-alice: reports histogram kagome_parachain_candidate_validation_code_size has at least 1 samples in buckets ["16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", "+Inf"] within 120 seconds
-
 # Ensure parachains made progress.
 # We have a different hard limit for the candidate max code size in different host implementations
 # so we can't check for a specific value here. we only ensure that block production continued
 
 alice: parachain 2000 block height is at least 10 within 200 seconds
+
+# Check code size.
+# We have a different hard limit for the candidate max code size in different host implementations
+# however if the code size is acceptable we should have it put in some metric bucket
+
+# check if we have at least 1 sample, but we should have many more.
+alice: reports histogram kagome_parachain_candidate_validation_code_size has at least 1 samples in buckets ["16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", "+Inf"] within 30 seconds

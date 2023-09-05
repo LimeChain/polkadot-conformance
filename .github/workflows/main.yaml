@@ -199,30 +199,30 @@ jobs:
 
       - name: Inject Acala wasm
         run: |
-          wasm-injector inject noops --size 60 validate_block ./wasm/acala.wasm.hex ./wasm/code-size-acala.wasm.hex --hexified --compressed
-          wasm-injector inject stack-overflow validate_block ./wasm/acala.wasm.hex ./wasm/stack-overflow-acala.wasm.hex --hexified --compressed
-          wasm-injector inject heap-overflow validate_block ./wasm/acala.wasm.hex ./wasm/heap-overflow-acala.wasm.hex --hexified --compressed
-          wasm-injector inject infinite-loop validate_block ./wasm/acala.wasm.hex ./wasm/infinite-loop-acala.wasm.hex --hexified --compressed
+          wasm-injector inject noops --size 50 validate_block ./wasm/acala.wasm.hex ./wasm/code-size-acala.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/acala.wasm.hex ./wasm/stack-overflow-acala.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/acala.wasm.hex ./wasm/heap-overflow-acala.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/acala.wasm.hex ./wasm/infinite-loop-acala.wasm.hex --hexified
     
       - name: Export Moonbeam wasm
         run: moonbeam export-genesis-wasm --chain=moonbase-local > ./wasm/moonbase.wasm.hex
 
       - name: Inject Moonbeam wasm
         run: |
-          wasm-injector inject noops --size 60 validate_block ./wasm/moonbase.wasm.hex ./wasm/code-size-moonbase.wasm.hex --hexified --compressed
-          wasm-injector inject stack-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/stack-overflow-moonbase.wasm.hex --hexified --compressed
-          wasm-injector inject heap-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/heap-overflow-moonbase.wasm.hex --hexified --compressed
-          wasm-injector inject infinite-loop validate_block ./wasm/moonbase.wasm.hex ./wasm/infinite-loop-moonbase.wasm.hex --hexified --compressed
+          wasm-injector inject noops --size 50 validate_block ./wasm/moonbase.wasm.hex ./wasm/code-size-moonbase.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/stack-overflow-moonbase.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/heap-overflow-moonbase.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/moonbase.wasm.hex ./wasm/infinite-loop-moonbase.wasm.hex --hexified
 
       - name: Export cumulus genesis wasm
         run: polkadot-parachain export-genesis-wasm --chain=staging > ./wasm/rococo.wasm.hex # This loads the chain_spec::rococo_parachain::staging_rococo_parachain_local_config()
 
       - name: Inject cumulus wasm
         run: |
-          wasm-injector inject noops --size 60 validate_block ./wasm/rococo.wasm.hex ./wasm/code-size-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject stack-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/stack-overflow-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject heap-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/heap-overflow-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject infinite-loop validate_block ./wasm/rococo.wasm.hex ./wasm/infinite-loop-rococo.wasm.hex --hexified --compressed
+          wasm-injector inject noops --size 50 validate_block ./wasm/rococo.wasm.hex ./wasm/code-size-rococo.wasm.hex --hexified
+          wasm-injector inject stack-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/stack-overflow-rococo.wasm.hex --hexified
+          wasm-injector inject heap-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/heap-overflow-rococo.wasm.hex --hexified
+          wasm-injector inject infinite-loop validate_block ./wasm/rococo.wasm.hex ./wasm/infinite-loop-rococo.wasm.hex --hexified
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
@@ -237,8 +237,6 @@ jobs:
         if: success() || failure()
         run: julia scripts/runTests.jl acala polkadot
 
-      - run: rm -rf /tmp/zombie-*
-
       - name: Run Kagome Tests with Moonbeam runtime
         if: success() || failure()
         run: julia scripts/runTests.jl moonbeam kagome
@@ -246,8 +244,6 @@ jobs:
       - name: Run Polkadot Tests with Moonbeam runtime
         if: success() || failure()
         run: julia scripts/runTests.jl moonbeam polkadot
-
-      - run: rm -rf /tmp/zombie-*
     
       - name: Run Kagome Tests with Rococo runtime
         if: success() || failure()

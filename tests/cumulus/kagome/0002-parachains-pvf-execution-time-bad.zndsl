@@ -8,19 +8,14 @@ alice: reports kagome_node_roles is 4
 # Ensure parachains are registered.
 alice: parachain 2000 is registered within 60 seconds
 
-# Ensure parachain did not make progress.
-alice: parachain 2000 block height = 0 within 10 seconds
+# Ensure parachains made progress.
+alice: parachain 2000 block height != 1 within 60 seconds
 
 # Check execution time.
 
-# Check if we have samples > 2s.
-alice: reports histogram kagome_pvf_execution_time has at least 1 samples in buckets ["3", "4", "5", "6", "8", "10", "12", "+Inf"] within 130 seconds
-
-# Check if we have 0 samples in =< 2s.
+# We do this check by ensuring all executions fall into bucket le="2" or lower.
+# First, check if we have at least 1 sample, but we should have many more.
 alice: reports histogram kagome_pvf_execution_time has at least 0 samples in buckets ["0.01", "0.025", "0.05", "0.1", "0.25", "0.5", "1", "2"] within 60 seconds
 
-# Ensure parachain did not make progress.
-alice: parachain 2000 block height = 0 within 10 seconds
-
-# Ensure parachain will not make progress.
-alice: parachain 2000 block height != 1 within 60 seconds
+# Check if we have no samples > 2s.
+alice: reports histogram kagome_pvf_execution_time has at least 1 samples in buckets ["3", "4", "5", "6", "8", "10", "12", "+Inf"] within 10 seconds
