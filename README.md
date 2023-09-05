@@ -27,7 +27,7 @@ For each host implementation we are testing using two different runtimes:
 # Usage
 To run the testing suite locally you need to fetch the following binaries on your machine:
 - `kagome`: you can fetch the latest binary through their docker container using the following command:
-```sh
+```
 docker run -v <desired_destination_on_local_machine>:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
 ```
 - [polkadot](https://github.com/paritytech/polkadot/releases)
@@ -35,36 +35,29 @@ docker run -v <desired_destination_on_local_machine>:/kagome --rm soramitsu/kago
 - [zombienet](https://github.com/paritytech/zombienet/releases)
 - [wasm-injector](https://github.com/LimeChain/wasm-injector)
 - `moonbeam`: you can fetch the latest binary through their docker container using the following command:
-```sh
+```
  docker run --user root -v <desired_destination_on_local_machine>:/hostdir --rm --entrypoint sh moonbeamfoundation/moonbeam:<desired_version> -c "cp /moonbeam/moonbeam /hostdir/moonbeam && chmod +x /hostdir/moonbeam"
 ```
 You can export the runtime WASM from polkadot-parachain using: `polkadot-parachain export-genesis-wasm > fetched.wasm`
 Or from moonbeam using: `moonbeam export-genesis-wasm --chain moonbase-local > fetched.wasm`
 To generate the injected WASM modules you need to run the following commands:
-```sh
+```
 wasm-injector convert fetched.wasm ./wasm/orig.wasm.hex --hexified
 wasm-injector inject noops --size 50 validate_block fetched.wasm ./wasm/code-size.wasm.hex --hexified
 wasm-injector inject stack-overflow validate_block fetched.wasm ./wasm/stack-overflow.wasm.hex --hexified
 wasm-injector inject heap-overflow validate_block fetched.wasm ./wasm/heap-overflow.wasm.hex --hexified
 wasm-injector inject infinite-loop validate_block fetched.wasm ./wasm/infinite-loop.wasm.hex --hexified
 ```
-You can run the tests using the following command. The options for runtimes are `cumulus`, `moonbeam`, `acala` and for hosts are `kagome`, `polkadot`:
-```sh
+You can run the tests using the following command. The options for runtimes are `cumulus`, `moonbeam` and for hosts are `kagome`, `polkadot`:
+```
 git clone https://github.com/LimeChain/polkadot-conformance
 cd polkadot-conformance
-julia scripts/runTests.jl [runtime] [host]
+julia scripts/runTests.jl <runtime>/<host>
 ```
 
 For example:
-```sh
-# Execute all tests for all runtimes and hosts
-julia scripts/runTests.jl
-
-# Execute only the tests for a specific runtime
-julia scripts/runTests.jl cumulus
-
-# Execute only the tests for a specific runtime and host
-julia scripts/runTests.jl acala kagome
+```
+julia scripts/runTests.jl cumulus/kagome
 ```
 
 
