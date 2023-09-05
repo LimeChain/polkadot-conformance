@@ -229,17 +229,15 @@ jobs:
         with:
           version: '1.9.1'
 
-      - name: Run Kagome Tests with Rococo runtime
+      - name: Run Kagome tests with Acala runtime
         if: success() || failure()
-        run: julia scripts/runTests.jl cumulus kagome
+        run: julia scripts/runTests.jl acala kagome
 
-      - name: Run Polkadot Tests with Rococo runtime
+      - name: Run Polkadot test with Acala runtime
         if: success() || failure()
-        run: julia scripts/runTests.jl cumulus polkadot
+        run: julia scripts/runTests.jl acala polkadot
 
-      - name: Clean up logs
-        if: success() || failure()
-        run: rm -rf /tmp/zombie-*
+      - run: rm -rf /tmp/zombie-*
 
       - name: Run Kagome Tests with Moonbeam runtime
         if: success() || failure()
@@ -249,14 +247,14 @@ jobs:
         if: success() || failure()
         run: julia scripts/runTests.jl moonbeam polkadot
 
-      - name: Clean up logs
+      - run: rm -rf /tmp/zombie-*
+    
+      - name: Run Kagome Tests with Rococo runtime
         if: success() || failure()
-        run: rm -rf /tmp/zombie-*
-      
-      - name: Run Kagome tests with Acala runtime
-        if: success() || failure()
-        run: julia scripts/runTests.jl acala kagome
+        run: julia scripts/runTests.jl cumulus kagome
 
-      - name: Run Polkadot test with Acala runtime
+      - name: Run Polkadot Tests with Rococo runtime
         if: success() || failure()
-        run: julia scripts/runTests.jl acala polkadot
+        run: julia scripts/runTests.jl cumulus polkadot
+
+
