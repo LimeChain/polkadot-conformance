@@ -1,5 +1,5 @@
 # Define the hosts, on which the tests will be run
-hosts::Vector{String} = ["acala/polkadot", "acala/kagome", "cumulus/polkadot", "cumulus/kagome", "moonbeam/polkadot", "moonbeam/kagome"]
+hosts::Vector{String} = ["cumulus/polkadot", "cumulus/kagome", "moonbeam/polkadot", "moonbeam/kagome"]
 
 # Add locally built or downloaded adapters, testers, and hosts to PATH
 ENV["PATH"] *= ":$(pwd())/bin"
