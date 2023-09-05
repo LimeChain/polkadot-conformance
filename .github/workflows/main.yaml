@@ -205,10 +205,10 @@ jobs:
           wasm-injector inject infinite-loop validate_block ./wasm/acala.wasm.hex ./wasm/infinite-loop-acala.wasm.hex --hexified
     
       - name: Run Kagome tests with Acala runtime
-        run: julia scripts/runTests.jl acala kagome
+        run: julia scripts/runTests.jl acala/kagome
 
       - name: Run Polkadot test with Acala runtime
-        run: julia scripts/runTests.jl acala polkadot
+        run: julia scripts/runTests.jl acala/polkadot
 
       - name: Export Moonbeam wasm
         run: moonbeam export-genesis-wasm --chain=moonbase-local > ./wasm/moonbase.wasm.hex
