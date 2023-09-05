@@ -97,13 +97,13 @@ jobs:
           echo "Moonbeam tag: ${{ steps.moonbeam-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Acala tag: ${{ steps.acala-release-tag.outputs.tag }}" >> dependencies.txt
       
-      - run: git diff-index HEAD --
+      - run: git diff HEAD --
       
-      # `git diff-index --quiet HEAD --` will exit with code 1 if there are changes and exit with code 0 if there aren't any changes to the code
+      # `git diff --quiet HEAD --` will exit with code 1 if there are changes and exit with code 0 if there aren't any changes to the code
       - name: Check if dependencies have changed
         id: check
         run: |
-          if git diff-index --quiet HEAD --; then
+          if git diff --quiet HEAD --; then
             echo "dependencies file has NOT changed."
             echo "new-release=false" >> "$GITHUB_OUTPUT"
           else
