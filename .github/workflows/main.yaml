@@ -166,7 +166,7 @@ jobs:
       
       - name: Fetch Kagome
         run: |
-          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
+          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:${{ needs.check.outputs.kagome-release-tag }} sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
 
       - name: Fetch Acala
         run: |
@@ -202,7 +202,7 @@ jobs:
           wasm-injector inject heap-overflow validate_block acala.wasm ./wasm/heap-overflow.wasm.hex --hexified
           wasm-injector inject infinite-loop validate_block acala.wasm ./wasm/infinite-loop.wasm.hex --hexified
     
-      - name: Run Acala Tests
+      - name: Run Kagome Tests
         run: julia scripts/runTests.jl acala/kagome
 
       - name: Run Polkadot Tests
