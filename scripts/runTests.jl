@@ -1,6 +1,5 @@
 # Define the hosts, on which the tests will be run
-hosts::Vector{String} = ["polkadot", "kagome"]
-runtimes::Vector{String} = ["cumulus", "moonbeam", "acala"]
+hosts::Vector{String} = ["acala/polkadot", "acala/kagome", "cumulus/polkadot", "cumulus/kagome", "moonbeam/polkadot", "moonbeam/kagome"]
 
 # Add locally built or downloaded adapters, testers, and hosts to PATH
 ENV["PATH"] *= ":$(pwd())/bin"
@@ -12,12 +11,12 @@ tests_dir::String = get(ENV ,"ZN_TESTS", "./tests")
 passed_tests::Vector{String} = []
 failed_tests::Vector{String} = []
 
-function run_host_tests(runtime::String, host::String)
-    println("Running tests with runtime `$(runtime)` on host `$(host)`")
+function run_host_tests(host::String)
+    println("Running tests for host $(host)")
     # Get host tests directory
-    runtime_host_tests_dir::String = joinpath(tests_dir, runtime, host)
+    host_tests_dir::String = joinpath(tests_dir, host)
     # Filter out the non-`.zndsl` files for each host
-    tests::Vector{String} = filter(file -> endswith(file, ".zndsl"), readdir(runtime_host_tests_dir))
+    tests::Vector{String} = filter(file -> endswith(file, ".zndsl"), readdir(host_tests_dir))
     
     # ... run each test
     for test::String in tests
@@ -28,8 +27,8 @@ function run_host_tests(runtime::String, host::String)
             test_name::String = match_captures[2]
 
             # Prepare the `zombienet test` command
-            command::Cmd = `zombienet -p native test $(joinpath(runtime_host_tests_dir, test))`
-            full_test_name::String = "[$(runtime)/$(host)] $(test_name)"
+            command::Cmd = `zombienet -p native test $(joinpath(host_tests_dir, test))`
+            full_test_name::String = "[$(host)] $(test_name)"
             println("Running test $(full_test_name)")
 
             # Try to run the test
@@ -50,30 +49,20 @@ end
 
 if isempty(ARGS)
     # For each host ...
-    for runtime::String in runtimes 
-        for host::String in hosts
-            withenv("ZOMBIENET_DEFAULT_START_COMMAND" => host) do
-                run_host_tests(runtime, host)
-            end
+    for host::String in hosts
+        withenv("ZOMBIENET_DEFAULT_START_COMMAND" => host) do
+            run_host_tests(host)
         end
     end
 else
-    # Get the runtime and host from the command line arguments
-    runtime::String = getindex(ARGS, 1)
-    host::String = getindex(ARGS, 2)
-
-    if (length(findall( x -> x == runtime, runtimes )) == 0)
-        println("Runtime `$(runtime)` not supported.")
-        exit(1)
-    end
-
+    # Get the host from the command line arguments
+    host::String = getindex(ARGS, 1)
     if (length(findall( x -> x == host, hosts )) == 0)
         println("Host `$(host)` not supported.")
         exit(1)
     end
-
     # Run the tests for the specified host
-    run_host_tests(runtime, host)
+    run_host_tests(host)
 end
 
 # Report the passed and failed tests

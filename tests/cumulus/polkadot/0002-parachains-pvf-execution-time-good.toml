@@ -21,8 +21,7 @@ requests = { memory = "2G", cpu = "1" }
 
 [[parachains]]
 id = 2000
-genesis_wasm_path="./wasm/rococo.wasm.hex"
-chain = "staging"
+genesis_wasm_path="./wasm/orig.wasm.hex"
 
   [parachains.collator]
   name = "collator01"

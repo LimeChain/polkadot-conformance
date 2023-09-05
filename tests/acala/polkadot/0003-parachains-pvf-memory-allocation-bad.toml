@@ -21,8 +21,8 @@ requests = { memory = "2G", cpu = "1" }
   
 [[parachains]]
 id = 2000
-genesis_wasm_path="./wasm/heap-overflow-acala.wasm.hex"
-chain = "acala-local"
+genesis_wasm_path="./wasm/heap-overflow.wasm.hex"
+chain = "acala-dev"
 
   [parachains.collator]
   name = "collator01"

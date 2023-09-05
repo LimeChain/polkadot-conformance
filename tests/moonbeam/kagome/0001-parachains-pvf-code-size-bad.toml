@@ -23,7 +23,7 @@ requests = { memory = "2G", cpu = "1" }
 
 [[parachains]]
 id = 2000
-genesis_wasm_path="./wasm/code-size-moonbase.wasm.hex"
+genesis_wasm_path="./wasm/code-size.wasm.hex"
 chain = "moonbase-local"
 
   [parachains.collator]
