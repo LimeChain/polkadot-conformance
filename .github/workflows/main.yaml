@@ -172,7 +172,7 @@ jobs:
       
       - name: Fetch Kagome
         run: |
-          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:latest sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
+          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:${{ needs.check.outputs.kagome-release-tag }} sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
 
       - name: Fetch Acala
         run: |
@@ -200,6 +200,16 @@ jobs:
       - name: Create wasm folder
         run: mkdir wasm
 
+      - name: Export Rococo genesis wasm
+        run: polkadot-parachain export-genesis-wasm --chain=staging > ./wasm/rococo.wasm.hex # This loads the chain_spec::rococo_parachain::staging_rococo_parachain_local_config()
+
+      - name: Inject Rococo wasm
+        run: |
+          wasm-injector inject noops --size 60 validate_block ./wasm/rococo.wasm.hex ./wasm/code-size-rococo.wasm.hex --hexified --compressed
+          wasm-injector inject stack-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/stack-overflow-rococo.wasm.hex --hexified --compressed
+          wasm-injector inject heap-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/heap-overflow-rococo.wasm.hex --hexified --compressed
+          wasm-injector inject infinite-loop validate_block ./wasm/rococo.wasm.hex ./wasm/infinite-loop-rococo.wasm.hex --hexified --compressed
+
       - name: Export Acala genesis wasm
         run: acala export-genesis-wasm --chain=acala-local > ./wasm/acala.wasm.hex
 
@@ -219,16 +229,6 @@ jobs:
           wasm-injector inject stack-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/stack-overflow-moonbase.wasm.hex --hexified --compressed
           wasm-injector inject heap-overflow validate_block ./wasm/moonbase.wasm.hex ./wasm/heap-overflow-moonbase.wasm.hex --hexified --compressed
           wasm-injector inject infinite-loop validate_block ./wasm/moonbase.wasm.hex ./wasm/infinite-loop-moonbase.wasm.hex --hexified --compressed
-
-      - name: Export cumulus genesis wasm
-        run: polkadot-parachain export-genesis-wasm --chain=staging > ./wasm/rococo.wasm.hex # This loads the chain_spec::rococo_parachain::staging_rococo_parachain_local_config()
-
-      - name: Inject cumulus wasm
-        run: |
-          wasm-injector inject noops --size 60 validate_block ./wasm/rococo.wasm.hex ./wasm/code-size-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject stack-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/stack-overflow-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject heap-overflow validate_block ./wasm/rococo.wasm.hex ./wasm/heap-overflow-rococo.wasm.hex --hexified --compressed
-          wasm-injector inject infinite-loop validate_block ./wasm/rococo.wasm.hex ./wasm/infinite-loop-rococo.wasm.hex --hexified --compressed
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
