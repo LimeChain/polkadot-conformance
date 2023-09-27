@@ -144,8 +144,8 @@ jobs:
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: "paritytech/polkadot-sdk"
-          file: "polkadot"
-          target: "polkadot"
+          file: "polkadot-prepare-worker"
+          target: "polkadot-prepare-worker"
           version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       
@@ -153,8 +153,8 @@ jobs:
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: "paritytech/polkadot-sdk"
-          file: "polkadot"
-          target: "polkadot"
+          file: "polkadot-execute-worker"
+          target: "polkadot-execute-worker"
           version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
