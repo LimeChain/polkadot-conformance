@@ -4,4 +4,4 @@ Kagome tag: v0.9.1
 Polkadot tag: v1.0.0
 Wasm injector tag: 0.3.0
 Moonbeam tag: v0.33.0
-Acala tag: 2.20.0
+Acala tag: 2.21.0
