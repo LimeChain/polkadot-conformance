@@ -1,7 +1,6 @@
 Tests folder hash: b39ae750c4837fcb68b8156dd7cb5f6ade278177
-Cumulus binary tag: v1.0.0
 Kagome tag: v0.9.1
-Polkadot tag: polkadot-v1.1.0
+Polkadot SDK tag: polkadot-v1.1.0
 Wasm injector tag: 0.3.0
 Moonbeam tag: v0.33.0
 Acala tag: 2.21.0
