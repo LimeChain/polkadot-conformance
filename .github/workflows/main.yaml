@@ -13,7 +13,7 @@ jobs:
   check:
     outputs:
       new-release: ${{ steps.check.outputs.new-release }}
-      cumulus-binary-release-tag: ${{ steps.cumulus-binary-release-tag.outputs.tag }}
+      polkadot-sdk-release-tag: ${{ steps.polkadot-sdk-release-tag.outputs.tag }}
       wasm-injector-release-tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}
       moonbeam-release-tag: ${{ steps.moonbeam-release-tag.outputs.tag }}
       acala-release-tag: ${{ steps.acala-release-tag.outputs.tag }}
@@ -48,15 +48,6 @@ jobs:
 
       - uses: oprypin/find-latest-tag@v1
         with:
-          repository: paritytech/cumulus  # The repository to scan.
-          releases-only: true  # We know that all relevant tags have a GitHub release for them.
-          prefix: 'v'
-        id: cumulus-binary-release-tag  # The step ID to refer to later.
-  
-      - run: echo "Cumulus binary is at version ${{ steps.cumulus-binary-release-tag.outputs.tag }}"
-
-      - uses: oprypin/find-latest-tag@v1
-        with:
           repository: soramitsu/kagome  # The repository to scan.
           releases-only: true  # We know that all relevant tags have a GitHub release for them.
         id: kagome-release-tag  # The step ID to refer to later.
@@ -67,9 +58,9 @@ jobs:
         with:
           repository: paritytech/polkadot-sdk  # The repository to scan.
           releases-only: true  # We know that all relevant tags have a GitHub release for them.
-        id: polkadot-release-tag  # The step ID to refer to later.
+        id: polkadot-sdk-release-tag  # The step ID to refer to later.
   
-      - run: echo "Polkadot is at version ${{ steps.polkadot-release-tag.outputs.tag }}"
+      - run: echo "Polkadot is at version ${{ steps.polkadot-sdk-release-tag.outputs.tag }}"
 
       - uses: oprypin/find-latest-tag@v1
         with:
@@ -90,9 +81,8 @@ jobs:
       - name: Write tags to dependencies file
         run: |
           echo "Tests folder hash: ${{ steps.test-folder-hash.outputs.hash }}" > dependencies.txt
-          echo "Cumulus binary tag: ${{ steps.cumulus-binary-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Kagome tag: ${{ steps.kagome-release-tag.outputs.tag }}" >> dependencies.txt
-          echo "Polkadot tag: ${{ steps.polkadot-release-tag.outputs.tag }}" >> dependencies.txt
+          echo "Polkadot SDK tag: ${{ steps.polkadot-sdk-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Wasm injector tag: ${{ steps.wasm-injector-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Moonbeam tag: ${{ steps.moonbeam-release-tag.outputs.tag }}" >> dependencies.txt
           echo "Acala tag: ${{ steps.acala-release-tag.outputs.tag }}" >> dependencies.txt
@@ -147,6 +137,7 @@ jobs:
           repo: "paritytech/polkadot-sdk"
           file: "polkadot"
           target: "polkadot"
+          version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Fetch Github Release Asset from polkadot-parachain
@@ -155,7 +146,7 @@ jobs:
           repo: "paritytech/polkadot-sdk"
           file: "polkadot-parachain"
           target: "polkadot-parachain"
-          version: "tags/${{ needs.check.outputs.cumulus-binary-release-tag }}"
+          version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Fetch Github Release Asset from zombienet
