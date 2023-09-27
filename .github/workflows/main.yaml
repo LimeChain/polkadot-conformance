@@ -131,7 +131,25 @@ jobs:
       - name: Rename wasm-injector
         run: mv wasm-injector-ubuntu-22 wasm-injector
 
-      - name: Fetch Github Release Asset from polkadot
+      - name: Fetch polkadot Github Release Asset from polkadot-sdk
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "paritytech/polkadot-sdk"
+          file: "polkadot"
+          target: "polkadot"
+          version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Fetch polkadot-prepare-worker Github Release Asset from polkadot-sdk
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "paritytech/polkadot-sdk"
+          file: "polkadot"
+          target: "polkadot"
+          version: "tags/${{ needs.check.outputs.polkadot-sdk-release-tag }}"
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      
+      - name: Fetch polkadot-execute-worker Github Release Asset from polkadot-sdk
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: "paritytech/polkadot-sdk"
@@ -184,9 +202,11 @@ jobs:
           echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
           sudo chmod +x moonbeam
           chmod +x polkadot
+          chmod +x polkadot-parachain
+          chmod +x polkadot-execute-worker
+          chmod +x polkadot-prepare-worker
           chmod +x zombienet
           chmod +x wasm-injector
-          chmod +x polkadot-parachain
 
       - name: Create wasm folder
         run: mkdir wasm
