@@ -48,7 +48,7 @@ jobs:
 
       - uses: oprypin/find-latest-tag@v1
         with:
-          repository: soramitsu/kagome  # The repository to scan.
+          repository: qdrvm/kagome  # The repository to scan.
           releases-only: true  # We know that all relevant tags have a GitHub release for them.
         id: kagome-release-tag  # The step ID to refer to later.
   
@@ -181,7 +181,7 @@ jobs:
       
       - name: Fetch Kagome
         run: |
-          docker run -v $GITHUB_WORKSPACE:/kagome --rm soramitsu/kagome:${{ needs.check.outputs.kagome-release-tag }} sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
+          docker run -v $GITHUB_WORKSPACE:/kagome --rm qdrvm/kagome:${{ needs.check.outputs.kagome-release-tag }} sh -c  "cp /usr/local/bin/kagome . && chmod +x kagome"
 
       - name: Fetch Acala
         run: |
