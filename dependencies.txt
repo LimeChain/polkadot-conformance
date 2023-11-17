@@ -2,5 +2,5 @@ Tests folder hash: b39ae750c4837fcb68b8156dd7cb5f6ade278177
 Kagome tag: v0.9.2
 Polkadot SDK tag: polkadot-v1.3.0
 Wasm injector tag: 0.3.0
-Moonbeam tag: runtime-2601
+Moonbeam tag: v0.34.0
 Acala tag: 2.22.0
