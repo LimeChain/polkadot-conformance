@@ -3,4 +3,4 @@ Kagome tag: v0.9.3
 Polkadot SDK tag: polkadot-v1.11.0
 Wasm injector tag: 0.3.0
 Moonbeam tag: v0.37.3
-Acala tag: 2.24.0
+Acala tag: 2.25.0
